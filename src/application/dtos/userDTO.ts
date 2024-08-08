@@ -9,6 +9,16 @@ export class CreateUserDTO {
     this.password = password;
   }
 }
+export class LoginUserDTO {
+  email: string;
+  password: string;
+  token: string;
+  constructor(email: string, password: string, token: string) {
+    this.email = email;
+    this.password = password;
+    this.token = token;
+  }
+}
 export class UpdateUserDTO {
   name?: string;
   email?: string;

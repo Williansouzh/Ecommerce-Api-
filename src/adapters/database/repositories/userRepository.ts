@@ -15,7 +15,9 @@ export class UserRepository implements UserRepositoryInterface {
   async findById(id: string): Promise<UserEntity | null> {
     return this.repository.findOne({ where: { id } }) || null;
   }
-
+  async getUserByEmail(email: string): Promise<UserEntity | null> {
+    return this.repository.findOne({ where: { email } });
+  }
   async findAll(): Promise<UserEntity[]> {
     return this.repository.find();
   }
