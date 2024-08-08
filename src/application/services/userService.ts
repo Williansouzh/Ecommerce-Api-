@@ -5,6 +5,7 @@ import { UserServiceInterface } from "../../domain/services/userServiceInterface
 import { UserRepositoryInterface } from "../../domain/repositories/userRepositoryInterface";
 import { CreateUserDTO, UpdateUserDTO } from "../dtos/userDTO";
 import { UserEntity } from "../../adapters/database/entities/userEntity";
+import AuthService from "./authService";
 
 @injectable()
 export class UserService implements UserServiceInterface {
@@ -24,6 +25,7 @@ export class UserService implements UserServiceInterface {
     const user = new UserEntity();
     user.name = dto.name;
     user.email = dto.email;
+    user.password = await AuthService.hashPassword(dto.password);
     return this.userRepository.create(user);
   }
 

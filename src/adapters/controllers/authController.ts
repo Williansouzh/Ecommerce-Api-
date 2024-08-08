@@ -21,11 +21,12 @@ export class AuthController {
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
     }
-
     try {
       const dto: CreateUserDTO = req.body;
       const user = await this.userService.createUser(dto);
-      res.status(201).json(user);
+      res
+        .status(201)
+        .json({ message: "User registered successfully", user: user.id });
     } catch (error) {
       next(error);
     }
