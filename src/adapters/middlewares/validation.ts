@@ -46,3 +46,6 @@ export const validateUserLogin = [
     .custom((value, { req }) => value === req.body.password)
     .withMessage("Passwords do not match"),
 ];
+export const recoveryUser = [
+  body("email").isEmail().withMessage("Email is not valid").normalizeEmail(),
+];

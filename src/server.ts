@@ -10,6 +10,7 @@ import { UserService } from "./application/services/userService";
 import { UserRepositoryInterface } from "./domain/repositories/userRepositoryInterface";
 import { UserServiceInterface } from "./domain/services/userServiceInterface";
 import { container } from "tsyringe";
+import { EmailService } from "./application/services/emailService";
 
 export class App {
   readonly port: number;
@@ -43,6 +44,8 @@ export class App {
       useClass: UserRepository,
     });
     container.registerSingleton(DatabaseService);
+
+    container.registerSingleton(EmailService);
   }
 
   public getApp(): Application {

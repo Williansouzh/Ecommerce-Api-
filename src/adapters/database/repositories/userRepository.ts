@@ -11,6 +11,9 @@ export class UserRepository implements UserRepositoryInterface {
   constructor() {
     this.repository = AppDataSource.getRepository(UserEntity);
   }
+  async findOneByToken(resetPasswordToken: string): Promise<UserEntity | null> {
+    return this.repository.findOne({ where: { resetPasswordToken } }) || null;
+  }
 
   async findById(id: string): Promise<UserEntity | null> {
     return this.repository.findOne({ where: { id } }) || null;
