@@ -2,10 +2,10 @@ import "reflect-metadata";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { injectable } from "tsyringe";
-
+import { EmailServiceInterface } from "@src/domain/services/emailServiceInterface";
 dotenv.config();
 @injectable()
-export class EmailService {
+export class EmailService implements EmailServiceInterface {
   private transporter: nodemailer.Transporter;
 
   constructor() {

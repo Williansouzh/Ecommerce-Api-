@@ -49,3 +49,25 @@ export const validateUserLogin = [
 export const recoveryUser = [
   body("email").isEmail().withMessage("Email is not valid").normalizeEmail(),
 ];
+
+export const validateProduct = [
+  body("name")
+    .isString()
+    .withMessage("Product name must be a string")
+    .isLength({ min: 1, max: 100 })
+    .withMessage("Product name must be between 1 and 100 characters long"),
+
+  body("description")
+    .isString()
+    .withMessage("Product description must be a string")
+    .isLength({ min: 1, max: 100 })
+    .withMessage(
+      "Product description must be between 1 and 100 characters long"
+    ),
+
+  body("price")
+    .isFloat({ gt: 0 })
+    .withMessage("Product price must be a positive number"),
+
+  body("categoryId").isUUID().withMessage("Category ID must be a valid UUID"),
+];

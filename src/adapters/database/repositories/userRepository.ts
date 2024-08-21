@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { UserRepositoryInterface } from "../../../domain/repositories/userRepositoryInterface";
 import { UserEntity } from "../entities/userEntity";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { AppDataSource } from "@src/data-source";
 
 @injectable()

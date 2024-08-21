@@ -5,7 +5,6 @@ import { inject, injectable } from "tsyringe";
 import { UserServiceInterface } from "../../domain/services/userServiceInterface";
 import { CreateUserDTO, LoginUserDTO } from "@src/application/dtos/userDTO";
 import { validationResult } from "express-validator";
-import { EmailService } from "@src/application/services/emailService";
 
 @injectable()
 export class AuthController {
