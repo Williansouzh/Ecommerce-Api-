@@ -96,7 +96,7 @@ export class UserService implements UserServiceInterface {
     const user = new UserEntity();
     user.name = dto.name;
     user.email = dto.email;
-    user.password = await AuthService.hashPassword(dto.password);
+    user.password = await AuthService.hashPassword(dto.password, 10);
     return this.userRepository.create(user);
   }
   async loginUser(payload: LoginUserDTO): Promise<LoggedUserDTO> {
@@ -105,7 +105,6 @@ export class UserService implements UserServiceInterface {
     if (!user) {
       throw new NotFoundError("User not found");
     }
-
     const isPasswordValid = await AuthService.comparePasswords(
       payload.password,
       user.password

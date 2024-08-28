@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  Unique,
-  BeforeInsert,
-} from "typeorm";
-import bcrypt from "bcrypt";
+import { Entity, PrimaryGeneratedColumn, Column, Unique } from "typeorm";
 @Entity("users")
 @Unique(["email"])
 export class UserEntity {
@@ -25,13 +18,4 @@ export class UserEntity {
 
   @Column({ nullable: true })
   resetPasswordExpires?: Date;
-
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 8);
-  }
-
-  async validatePassword(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password);
-  }
 }

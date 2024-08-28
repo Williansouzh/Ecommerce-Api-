@@ -21,7 +21,7 @@ export class CreateUserDTO {
 export class LoginUserDTO {
   email: string;
   password: string;
-  token: string;
+  token?: string;
   constructor(email: string, password: string, token: string) {
     this.email = email;
     this.password = password;

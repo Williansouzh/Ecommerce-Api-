@@ -4,9 +4,11 @@ import { container } from "tsyringe";
 import { AuthController } from "../controllers/authController";
 import {
   recoveryUser,
+  resetPasswordUser,
   validateUser,
   validateUserLogin,
 } from "../middlewares/validation";
+import { authMiddleware } from "../middlewares/auth";
 
 const routes = Router();
 const url = "/api-ecommerce/auth";
@@ -28,7 +30,8 @@ routes.post(
   authController.passwordRecovery.bind(authController)
 );
 routes.post(
-  `${url}/password-reset/:token`,
+  `${url}/reset-password/:token`,
+  resetPasswordUser,
   authController.passwordReset.bind(authController)
 );
 

@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { UserEntity } from "@src/adapters/database/entities/userEntity";
 import { injectable } from "tsyringe";
 dotenv.config();
-//version of the user that is send to via API and decoded from the Json Web Token
 export interface DecodedUser extends Omit<UserEntity, "id"> {
   id: string;
 }

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { ProductEntity } from "@src/adapters/database/entities/productEntity";
 import { ProductRepositoryInterface } from "@src/domain/repositories/productRepositoryInterface";
 import { ProductServiceInterface } from "@src/domain/services/productServiceInterface";

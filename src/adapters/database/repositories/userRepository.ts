@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { injectable } from "tsyringe";
 import { UserRepositoryInterface } from "../../../domain/repositories/userRepositoryInterface";
 import { UserEntity } from "../entities/userEntity";
@@ -40,5 +41,8 @@ export class UserRepository implements UserRepositoryInterface {
   async delete(id: string): Promise<boolean> {
     const result = await this.repository.delete(id);
     return result.affected !== 0;
+  }
+  async clear(): Promise<void> {
+    await this.repository.clear();
   }
 }

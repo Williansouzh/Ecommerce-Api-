@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Request, Response, NextFunction } from "express";
 import { inject, injectable } from "tsyringe";
 import { UserServiceInterface } from "../../domain/services/userServiceInterface";

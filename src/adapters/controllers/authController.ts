@@ -1,5 +1,5 @@
-import "../../utils/module.alias";
 import "reflect-metadata";
+import "../../utils/module.alias";
 import { Request, Response, NextFunction } from "express";
 import { inject, injectable } from "tsyringe";
 import { UserServiceInterface } from "../../domain/services/userServiceInterface";
@@ -15,10 +15,10 @@ export class AuthController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ): Promise<Response | void> {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
     try {
       const dto: CreateUserDTO = req.body;

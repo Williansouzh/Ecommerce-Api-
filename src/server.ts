@@ -4,6 +4,8 @@ import "./container";
 import express, { Application } from "express";
 import authRoutes from "./adapters/routes/authRoutes";
 import productRoutes from "./adapters/routes/productRoutes";
+import cartRoutes from "./adapters/routes/cartRoutes";
+import orderRoutes from "./adapters/routes/orderRoutes";
 import { errorMiddleware } from "./adapters/middlewares/errorHandler";
 import { DatabaseService } from "./adapters/database/connection";
 import { UserRepository } from "./adapters/database/repositories/userRepository";
@@ -66,6 +68,8 @@ export class App {
   private setupRoutes(): void {
     this.app.use(authRoutes);
     this.app.use(productRoutes);
+    this.app.use(cartRoutes);
+    this.app.use(orderRoutes);
   }
 
   private async databaseSetup(): Promise<void> {
