@@ -1,12 +1,8 @@
 import { CartEntity } from "@src/adapters/database/entities/cartEntity";
-import { CartDTO } from "@src/application/dtos/cartDTO";
+import { CartDTO, CartItemDTO } from "@src/application/dtos/cartDTO";
 
 export interface CartRepositoryInterface {
-  addItem(
-    userId: string,
-    productId: string,
-    quantity: number
-  ): Promise<CartEntity>;
+  addItem(userid: string, newItem: CartItemDTO): Promise<CartEntity>;
   updateItem(
     userId: string,
     productId: string,

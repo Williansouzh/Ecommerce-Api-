@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { CartEntity } from "../entities/cartEntity";
 import { CartItemEntity } from "../entities/cartItemEntity";
 import { AppDataSource } from "@src/data-source";
-import { CartDTO } from "@src/application/dtos/cartDTO";
+import { CartDTO, CartItemDTO } from "@src/application/dtos/cartDTO";
 import { NotFoundError } from "@src/utils/api-errors";
 import { CartRepositoryInterface } from "@src/domain/repositories/cartRepositoryInterface";
 
@@ -18,24 +18,29 @@ export class CartRepository implements CartRepositoryInterface {
   }
   public async addItem(
     userId: string,
-    productId: string,
-    quantity: number
+    newItem: CartItemDTO
   ): Promise<CartEntity> {
     const cart = await this.getCartOrCreate(userId);
-    const item = cart.items.find((item) => item.productId === productId);
 
-    if (item) {
-      item.quantity += quantity;
+    const existingItem = cart.items.find(
+      (item) => item.productId === newItem.productId
+    );
+
+    if (existingItem) {
+      existingItem.quantity += newItem.quantity;
     } else {
-      const newItem = this.itemRepository.create({
-        productId,
-        quantity,
-        cart,
+      const createdItem = this.itemRepository.create({
+        productId: newItem.productId,
+        name: newItem.name,
+        quantity: newItem.quantity,
+        price: newItem.price,
+        cart: cart,
       });
-      cart.items.push(newItem);
+      cart.items.push(createdItem);
     }
 
     cart.totalPrice = this.calculateTotalPrice(cart.items);
+
     return await this.repository.save(cart);
   }
 

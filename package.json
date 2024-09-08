@@ -7,10 +7,11 @@
     "start:local": "ts-node-dev --transpile-only src/index.ts",
     "test:unit": "jest ./test/unit --forceExit ",
     "test:coverage": "jest --coverage",
-    "test:functional": "jest --projects ./test/functional --forceExit --runInBand",
+    "test:functional": "jest --projects ./test --forceExit --runInBand",
     "typeorm": "ts-node-dev node_modules/typeorm/cli.js",
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:generate ./src/adapters/database/migrations/default",
-    "migration:run": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:run"
+    "migration:run": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:revert"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +35,7 @@
     "path": "^0.12.7",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.2.2",
+    "stripe": "^16.10.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.4",
     "tsyringe": "^4.8.0",

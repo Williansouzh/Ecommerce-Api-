@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, check } from "express-validator";
 import { container } from "tsyringe";
 import { UserRepository } from "../database/repositories/userRepository";
 import { OrderItemEntity } from "../database/entities/OrderItemEntity";
@@ -99,12 +99,6 @@ export const validateProduct = [
   body("categoryId").isUUID().withMessage("Category ID must be a valid UUID"),
 ];
 export const validateOrder = [
-  body("userId")
-    .isString()
-    .withMessage("User ID must be a string")
-    .notEmpty()
-    .withMessage("User ID is required"),
-
   body("items")
     .isArray()
     .withMessage("Items must be an array")
@@ -127,14 +121,6 @@ export const validateOrder = [
       return true;
     }),
 
-  body("totalPrice")
-    .isDecimal({ decimal_digits: "0,2" })
-    .withMessage(
-      "Total price must be a decimal number with up to two decimal places"
-    )
-    .notEmpty()
-    .withMessage("Total price is required"),
-
   body("status").optional().isString().withMessage("Status must be a string"),
 
   body("createdAt")
@@ -146,4 +132,31 @@ export const validateOrder = [
     .optional()
     .isISO8601()
     .withMessage("Updated at must be a valid date in ISO8601 format"),
+];
+export const paymentValidation = [
+  check("orderId")
+    .notEmpty()
+    .withMessage("Order ID is required")
+    .isUUID()
+    .withMessage("Invalid Order ID format"),
+  check("paymentMethod")
+    .notEmpty()
+    .withMessage("Payment method is required")
+    .isIn(["credit_card"])
+    .withMessage("Invalid payment method"),
+  check("paymentDetails.cardNumber")
+    .notEmpty()
+    .withMessage("Card number is required")
+    .isCreditCard()
+    .withMessage("Invalid card number"),
+  check("paymentDetails.expiryDate")
+    .notEmpty()
+    .withMessage("Expiry date is required")
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/)
+    .withMessage("Invalid expiry date"),
+  check("paymentDetails.cvv")
+    .notEmpty()
+    .withMessage("CVV is required")
+    .isLength({ min: 3, max: 4 })
+    .withMessage("Invalid CVV"),
 ];

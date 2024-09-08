@@ -38,7 +38,10 @@ export class OrderRepository implements OrderRepositoryInterface {
   }
 
   async getOrdersByUser(userId: string): Promise<OrderEntity[]> {
-    return await this.repository.find({ where: { userId } });
+    return await this.repository.find({
+      where: { userId },
+      relations: ["items"],
+    });
   }
 
   async getOrders(page: number, limit: number): Promise<OrderEntity[]> {

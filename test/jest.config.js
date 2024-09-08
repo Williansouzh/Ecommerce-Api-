@@ -11,6 +11,6 @@ module.exports = {
     rootDir: root,
     displayName: "end2end-tests",
     setupFilesAfterEnv: ["<rootDir>/test/jest-setup.ts"],
-    testMatch: ["<rootDir>/test/functional/**/*.test.ts"],
+    testMatch: ["<rootDir>/test/**/*.test.ts"],
   },
 };

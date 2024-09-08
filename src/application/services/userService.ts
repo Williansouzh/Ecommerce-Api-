@@ -28,15 +28,17 @@ export class UserService implements UserServiceInterface {
       ) {
         throw new Error("Invalid or expired token.");
       }
-
-      user.password = await this.hashPassword(newPassword);
+      if (!newPassword) {
+        throw new Error("New password is required, password: " + newPassword);
+      }
+      const hashedPassword = await this.hashPassword(newPassword);
+      user.password = hashedPassword;
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
 
       await this.userRepository.update(user.id, user);
     } catch (error) {
       console.error("Error resetting password:", error);
-
       throw new Error("Failed to reset password. Please try again later.");
     }
   }
@@ -71,8 +73,12 @@ export class UserService implements UserServiceInterface {
     }
   }
 
-  private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
+  async hashPassword(password: string): Promise<string> {
+    if (!password) {
+      throw new Error("Password is required for hashing");
+    }
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
   }
   private generateResetToken(): string {
     return crypto.randomBytes(20).toString("hex");

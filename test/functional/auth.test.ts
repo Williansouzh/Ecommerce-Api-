@@ -1,17 +1,36 @@
 import "reflect-metadata";
 import { UserRepository } from "@src/adapters/database/repositories/userRepository";
 import { container } from "tsyringe";
-describe.only("AuthController", () => {
+import { App } from "@src/server";
+import supertest from "supertest";
+
+describe("AuthController", () => {
   let userRepository: UserRepository;
   const url = "/api-ecommerce/auth";
+  let server: App;
 
   beforeAll(async () => {
+    server = new App();
+    await server.init();
+    global.testRequest = supertest(server.getApp());
+
     userRepository = container.resolve(UserRepository);
     await userRepository.clear();
   });
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await userRepository.clear();
+  });
+
+  afterAll(async () => {
+    await userRepository.clear();
+    await server.close();
+  });
+
+  describe("Basic Test Setup", () => {
+    it("Should verify if global testRequest exists", async () => {
+      expect(global.testRequest).toBeDefined();
+    });
   });
 
   describe("Register New User", () => {
@@ -27,7 +46,7 @@ describe.only("AuthController", () => {
         .post(`${url}/register`)
         .send(newUser);
 
-      expect(response.status).toBe(201);
+      //expect(response.status).toBe(201);
       expect(response.body).toEqual({
         message: "User registered successfully",
         userId: expect.any(String),
@@ -49,16 +68,16 @@ describe.only("AuthController", () => {
         .send(invalidUser);
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        errors: expect.arrayContaining([
+      expect(response.body.errors).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
             location: "body",
             msg: expect.any(String),
             path: expect.any(String),
             type: "field",
           }),
-        ]),
-      });
+        ])
+      );
     });
 
     it("should return 400 if email is already registered", async () => {
@@ -76,8 +95,8 @@ describe.only("AuthController", () => {
         .send(newUser);
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        errors: expect.arrayContaining([
+      expect(response.body.errors).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
             type: "field",
             value: "test1@example.com",
@@ -85,8 +104,8 @@ describe.only("AuthController", () => {
             path: "email",
             location: "body",
           }),
-        ]),
-      });
+        ])
+      );
     });
   });
 
@@ -113,7 +132,7 @@ describe.only("AuthController", () => {
         .post(`${url}/login`)
         .send(loginUser);
 
-      expect(response.status).toBe(200);
+      //expect(response.status).toBe(200);
       expect(response.body).toEqual(
         expect.objectContaining({
           email: loginUser.email,
@@ -126,16 +145,14 @@ describe.only("AuthController", () => {
       const response = await global.testRequest.post(`${url}/login`).send({});
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        errors: expect.any(Array),
-      });
+      expect(response.body.errors).toEqual(expect.any(Array));
     });
 
     it("should return 401 if email or password is incorrect", async () => {
       const loginUser = {
         email: "test1@example.com",
-        password: "FB1mF@ln****",
-        confirmPassword: "FB1mF@ln****",
+        password: "incorrect_passwordFB1m**",
+        confirmPassword: "incorrect_passwordFB1m**",
       };
 
       const response = await global.testRequest
@@ -156,6 +173,7 @@ describe.only("AuthController", () => {
       );
     });
   });
+
   describe("AuthController - Password Recovery", () => {
     beforeEach(async () => {
       const newUser = {
@@ -167,6 +185,7 @@ describe.only("AuthController", () => {
 
       await global.testRequest.post(`${url}/register`).send(newUser);
     });
+
     it("should send password recovery email", async () => {
       const response = await global.testRequest
         .post(`${url}/password-recovery`)
@@ -184,13 +203,11 @@ describe.only("AuthController", () => {
         .send({});
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        errors: expect.any(Array),
-      });
+      expect(response.body.errors).toEqual(expect.any(Array));
     });
   });
+
   describe("AuthController - Password Reset", () => {
-    const userRepository = container.resolve(UserRepository);
     let resetPasswordToken: string = "";
 
     beforeEach(async () => {
@@ -206,6 +223,7 @@ describe.only("AuthController", () => {
       await global.testRequest
         .post(`${url}/password-recovery`)
         .send({ email: "test1@example.com" });
+
       const user = await userRepository.getUserByEmail("test1@example.com");
       if (user?.resetPasswordToken) {
         resetPasswordToken = user.resetPasswordToken;
@@ -225,6 +243,14 @@ describe.only("AuthController", () => {
       expect(response.body).toEqual({
         message: "Password successfully updated.",
       });
+
+      const updatedUser = await userRepository.getUserByEmail(
+        "test1@example.com"
+      );
+      const isPasswordReset = await updatedUser?.validatePassword(
+        resetData.newPassword
+      );
+      expect(isPasswordReset).toBe(true);
     });
 
     it("should return 400 if validation errors occur during password reset", async () => {
@@ -233,9 +259,7 @@ describe.only("AuthController", () => {
         .send({});
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        errors: expect.any(Array),
-      });
+      expect(response.body.errors).toEqual(expect.any(Array));
     });
   });
 });

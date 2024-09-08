@@ -24,6 +24,7 @@
       "@entity/*": ["entity/*"]
     },
     "rootDirs": ["./src", "./test"],
+
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

@@ -1,7 +1,7 @@
-import { CartDTO } from "@src/application/dtos/cartDTO";
+import { CartDTO, CartItemDTO } from "@src/application/dtos/cartDTO";
 
 export interface CartServiceInterface {
-  addItem(productId: string, quantity: number, userId: string): Promise<void>;
+  addItem(userid: string, newItem: CartItemDTO): Promise<void>;
   updateItem(
     productId: string,
     quantity: number,

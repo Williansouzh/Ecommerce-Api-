@@ -4,7 +4,7 @@ import { CartServiceInterface } from "@src/domain/services/cartServiceInterface"
 import { CartRepository } from "@src/adapters/database/repositories/cartRepository";
 import { ProductServiceInterface } from "@src/domain/services/productServiceInterface";
 import { ApiError } from "@src/utils/api-errors";
-import { CartDTO } from "@src/application/dtos/cartDTO";
+import { CartDTO, CartItemDTO } from "@src/application/dtos/cartDTO";
 
 @injectable()
 export class CartService implements CartServiceInterface {
@@ -13,12 +13,9 @@ export class CartService implements CartServiceInterface {
     @inject("ProductService") private productService: ProductServiceInterface
   ) {}
 
-  public async addItem(
-    productId: string,
-    quantity: number,
-    userId: string
-  ): Promise<void> {
-    const product = await this.productService.getProduct(productId);
+  public async addItem(userId: string, newItem: CartItemDTO): Promise<void> {
+    const product = await this.productService.getProduct(newItem.productId);
+
     if (!product) {
       throw new ApiError(
         "Product not found",
@@ -28,7 +25,14 @@ export class CartService implements CartServiceInterface {
       );
     }
 
-    await this.cartRepository.addItem(userId, productId, quantity);
+    const item: CartItemDTO = {
+      productId: newItem.productId,
+      quantity: newItem.quantity,
+      name: product.name,
+      price: product.price,
+    };
+
+    await this.cartRepository.addItem(userId, item);
   }
 
   public async updateItem(

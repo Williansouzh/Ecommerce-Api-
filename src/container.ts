@@ -8,12 +8,14 @@ import { ProductRepository } from "./adapters/database/repositories/productRepos
 import { CartRepository } from "./adapters/database/repositories/cartRepository";
 import { OrderRepository } from "./adapters/database/repositories/orderRepository";
 // Services
+import { PaymentService } from "./application/services/paymentService";
 import { UserService } from "@src/application/services/userService";
 import { EmailService } from "./application/services/emailService";
 import ProductService from "./application/services/productService";
 import { CartService } from "./application/services/cartService";
 import { OrderService } from "./application/services/orderService";
 // Interfaces
+import { PaymentServiceInterface } from "./domain/services/paymentServiceInterface";
 import { OrderServiceInterface } from "./domain/services/orderServiceInterface";
 import { UserRepositoryInterface } from "@src/domain/repositories/userRepositoryInterface";
 import { UserServiceInterface } from "@src/domain/services/userServiceInterface";
@@ -52,6 +54,9 @@ container.register<CartServiceInterface>("CartService", {
 
 container.register<OrderServiceInterface>("OrderService", {
   useClass: OrderService,
+});
+container.register<PaymentServiceInterface>("PaymentService", {
+  useClass: PaymentService,
 });
 
 // Singleton Registration

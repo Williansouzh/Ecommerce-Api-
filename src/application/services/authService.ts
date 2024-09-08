@@ -6,7 +6,7 @@ import { UserEntity } from "@src/adapters/database/entities/userEntity";
 import { injectable } from "tsyringe";
 dotenv.config();
 export interface DecodedUser extends Omit<UserEntity, "id"> {
-  id: string;
+  userId: string;
 }
 export default class AuthService {
   public static async hashPassword(

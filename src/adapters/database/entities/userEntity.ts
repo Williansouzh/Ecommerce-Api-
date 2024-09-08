@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique } from "typeorm";
+import bcrypt from "bcrypt";
 @Entity("users")
 @Unique(["email"])
 export class UserEntity {
@@ -18,4 +19,7 @@ export class UserEntity {
 
   @Column({ nullable: true })
   resetPasswordExpires?: Date;
+  async validatePassword(password: string): Promise<boolean> {
+    return await bcrypt.compare(password, this.password);
+  }
 }

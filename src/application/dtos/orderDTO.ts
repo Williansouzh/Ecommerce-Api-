@@ -7,6 +7,13 @@ export class CreateOrderDTO {
     price: number;
   }[];
   totalPrice: number;
+  paymentMethod: string; // New field for payment method
+  paymentDetails: {
+    // New field for payment details
+    cardNumber: string;
+    expiryDate: string;
+    cvv: string;
+  };
   status?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -20,6 +27,12 @@ export class CreateOrderDTO {
       price: number;
     }[],
     totalPrice: number,
+    paymentMethod: string,
+    paymentDetails: {
+      cardNumber: string;
+      expiryDate: string;
+      cvv: string;
+    },
     status?: string,
     createdAt?: Date,
     updatedAt?: Date
@@ -27,6 +40,8 @@ export class CreateOrderDTO {
     this.userId = userId;
     this.items = items;
     this.totalPrice = totalPrice;
+    this.paymentMethod = paymentMethod;
+    this.paymentDetails = paymentDetails;
     this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
