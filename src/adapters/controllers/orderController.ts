@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { inject, injectable } from "tsyringe";
 import { OrderEntity } from "../database/entities/orderEntity";
+import { ApiError } from "@src/utils/api-errors";
 
 @injectable()
 export class OrderController {
@@ -116,6 +117,56 @@ export class OrderController {
         .json({ message: "Order status updated successfully" });
     } catch (error) {
       return next(error);
+    }
+  }
+  public async deleteOrder(
+    req: Request<{ id: string }>, // Assuming orderId is passed as a URL parameter
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    const userId = req.decoded?.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required." });
+    }
+
+    const { id: orderId } = req.params; // Extracting orderId from URL parameters
+
+    try {
+      const order = await this.orderService.getOrder(orderId);
+      if (!order || order.userId !== userId) {
+        return res
+          .status(404)
+          .json({ message: "Order not found or access denied." });
+      }
+
+      const deleted = await this.orderService.deleteOrder(orderId);
+      if (deleted) {
+        return res.status(200).json({ message: "Order deleted successfully" });
+      } else {
+        return res.status(500).json({ message: "Failed to delete the order" });
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      // Safe error handling
+      if (error instanceof Error) {
+        return next(
+          new ApiError(
+            "Error deleting order",
+            500,
+            error.message,
+            "Order controller"
+          )
+        );
+      } else {
+        return next(
+          new ApiError(
+            "Unknown error",
+            500,
+            "An unexpected error occurred",
+            "Order Controller"
+          )
+        );
+      }
     }
   }
 }
