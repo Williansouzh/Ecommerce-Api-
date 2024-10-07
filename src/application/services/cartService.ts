@@ -56,7 +56,9 @@ export class CartService implements CartServiceInterface {
   public async removeItem(productId: string, userId: string): Promise<void> {
     await this.cartRepository.removeItem(userId, productId);
   }
-
+  public async removeAll(userId: string): Promise<void> {
+    await this.cartRepository.removeAll(userId);
+  }
   public async getCart(userId: string): Promise<CartDTO> {
     const cart = await this.cartRepository.getCart(userId);
     if (!cart) {

@@ -7,7 +7,11 @@ import { UserRepository } from "@src/adapters/database/repositories/userReposito
 import { ProductRepository } from "./adapters/database/repositories/productRepository";
 import { CartRepository } from "./adapters/database/repositories/cartRepository";
 import { OrderRepository } from "./adapters/database/repositories/orderRepository";
+import { SalesRepository } from "./adapters/database/repositories/salesRepository";
+import { CategoryRepository } from "./adapters/database/repositories/categoryRepository";
 // Services
+import { CategoryService } from "./application/services/categoryService";
+import { SalesReportService } from "./application/services/salesReportService";
 import { PaymentService } from "./application/services/paymentService";
 import { UserService } from "@src/application/services/userService";
 import { EmailService } from "./application/services/emailService";
@@ -15,6 +19,8 @@ import ProductService from "./application/services/productService";
 import { CartService } from "./application/services/cartService";
 import { OrderService } from "./application/services/orderService";
 // Interfaces
+import { CategoryServiceInterface } from "./domain/services/categoryServiceInterface";
+import { SalesReportServiceInterface } from "./domain/services/salesReportServiceInterface";
 import { PaymentServiceInterface } from "./domain/services/paymentServiceInterface";
 import { OrderServiceInterface } from "./domain/services/orderServiceInterface";
 import { UserRepositoryInterface } from "@src/domain/repositories/userRepositoryInterface";
@@ -25,8 +31,18 @@ import { CartServiceInterface } from "./domain/services/cartServiceInterface";
 import { ProductRepositoryInterface } from "./domain/repositories/productRepositoryInterface";
 import { OrderRepositoryInterface } from "./domain/repositories/orderRepositoryInterface";
 import { CartRepositoryInterface } from "./domain/repositories/cartRepositoryInterface";
+import { SalesRepositoryInterface } from "./domain/repositories/salesRepositoryInterface";
 
 // Dependency Injection Registration
+container.register<CategoryServiceInterface>("CategoryService", {
+  useClass: CategoryService,
+});
+container.register<SalesReportServiceInterface>("SalesReportService", {
+  useClass: SalesReportService,
+});
+container.register<SalesRepositoryInterface>("SalesRepository", {
+  useClass: SalesRepository,
+});
 container.register<OrderRepositoryInterface>("OrderRepository", {
   useClass: OrderRepository,
 });
@@ -51,7 +67,6 @@ container.register<ProductServiceInterface>("ProductService", {
 container.register<CartServiceInterface>("CartService", {
   useClass: CartService,
 });
-
 container.register<OrderServiceInterface>("OrderService", {
   useClass: OrderService,
 });

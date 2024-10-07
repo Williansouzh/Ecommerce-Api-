@@ -77,7 +77,12 @@ export class CartRepository implements CartRepositoryInterface {
 
     await this.repository.save(cart);
   }
-
+  public async removeAll(userId: string): Promise<void> {
+    const cart = await this.getCartOrCreate(userId);
+    cart.items = [];
+    cart.totalPrice = 0;
+    await this.repository.save(cart);
+  }
   public async getCart(userId: string): Promise<CartDTO | null> {
     const cart = await this.repository.findOne({
       where: { userId },

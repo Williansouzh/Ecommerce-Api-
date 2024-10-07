@@ -9,4 +9,5 @@ export interface CartServiceInterface {
   ): Promise<void>;
   removeItem(productId: string, userId: string): Promise<void>;
   getCart(userId: string): Promise<CartDTO>;
+  removeAll(userId: string): Promise<void>;
 }

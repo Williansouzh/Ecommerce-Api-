@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { injectable } from "tsyringe";
 import { CategoryRepository } from "@src/adapters/database/repositories/categoryRepository";
 import { CategoryEntity } from "@src/adapters/database/entities/categoryEntity";
@@ -13,10 +14,16 @@ export class CategoryService implements CategoryServiceInterface {
     const createdCategory = await this.categoryRepository.createCategory(
       category
     );
+    if (!createdCategory.id) {
+      throw new Error("Failed to create category: ID is undefined.");
+    }
     return createdCategory.id;
   }
 
-  async listCategories(): Promise<CategoryEntity[]> {
-    return await this.categoryRepository.listCategories();
+  async listCategories(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<CategoryEntity[]> {
+    return await this.categoryRepository.listCategories(page, limit);
   }
 }

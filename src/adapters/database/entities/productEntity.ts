@@ -27,9 +27,6 @@ export class ProductEntity {
   @JoinColumn({ name: "categoryId" })
   category!: CategoryEntity;
 
-  @Column({ type: "varchar" })
-  categoryId!: string;
-
   @CreateDateColumn()
   createdAt!: Date;
 

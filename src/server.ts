@@ -7,6 +7,7 @@ import productRoutes from "./adapters/routes/productRoutes";
 import cartRoutes from "./adapters/routes/cartRoutes";
 import orderRoutes from "./adapters/routes/orderRoutes";
 import paymentRoutes from "./adapters/routes/paymentRoutes";
+import adminRoutes from "./adapters/routes/adminRouter";
 import { errorMiddleware } from "./adapters/middlewares/errorHandler";
 import { DatabaseService } from "./adapters/database/connection";
 import { UserRepository } from "./adapters/database/repositories/userRepository";
@@ -72,6 +73,7 @@ export class App {
     this.app.use(cartRoutes);
     this.app.use(orderRoutes);
     this.app.use(paymentRoutes);
+    this.app.use(adminRoutes);
   }
 
   private async databaseSetup(): Promise<void> {

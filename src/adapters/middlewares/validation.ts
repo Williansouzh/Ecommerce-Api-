@@ -95,43 +95,16 @@ export const validateProduct = [
   body("price")
     .isFloat({ gt: 0 })
     .withMessage("Product price must be a positive number"),
-
-  body("categoryId").isUUID().withMessage("Category ID must be a valid UUID"),
+];
+export const validateCartItem = [
+  body("productId").notEmpty,
+  body("quantity").notEmpty,
 ];
 export const validateOrder = [
-  body("items")
-    .isArray()
-    .withMessage("Items must be an array")
-    .notEmpty()
-    .withMessage("Items array cannot be empty")
-    .custom((items) => {
-      items.forEach((item: OrderItemEntity) => {
-        if (!item.productId || !item.name || !item.quantity || !item.price) {
-          throw new Error(
-            "Each item must have productId, name, quantity, and price"
-          );
-        }
-        if (typeof item.quantity !== "number" || item.quantity <= 0) {
-          throw new Error("Quantity must be a positive number");
-        }
-        if (typeof item.price !== "number" || item.price < 0) {
-          throw new Error("Price must be a non-negative number");
-        }
-      });
-      return true;
-    }),
+  body("adress").notEmpty,
 
   body("status").optional().isString().withMessage("Status must be a string"),
-
-  body("createdAt")
-    .optional()
-    .isISO8601()
-    .withMessage("Created at must be a valid date in ISO8601 format"),
-
-  body("updatedAt")
-    .optional()
-    .isISO8601()
-    .withMessage("Updated at must be a valid date in ISO8601 format"),
+  body("paymentMethod").notEmpty,
 ];
 export const paymentValidation = [
   check("orderId")

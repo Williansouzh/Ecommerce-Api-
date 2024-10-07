@@ -10,4 +10,5 @@ export interface CartRepositoryInterface {
   ): Promise<CartEntity>;
   removeItem(userId: string, productId: string): Promise<void>;
   getCart(userId: string): Promise<CartDTO | null>;
+  removeAll(userId: string): Promise<void>;
 }

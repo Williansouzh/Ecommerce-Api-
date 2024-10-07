@@ -5,6 +5,8 @@ import { inject, injectable } from "tsyringe";
 import dotenv from "dotenv";
 import { OrderRepository } from "@src/adapters/database/repositories/orderRepository";
 import { ApiError } from "@src/utils/api-errors";
+import { SalesRepository } from "@src/adapters/database/repositories/salesRepository";
+import { SaleEntity } from "@src/adapters/database/entities/salesEntity";
 
 dotenv.config();
 
@@ -13,6 +15,7 @@ export class PaymentService implements PaymentServiceInterface {
   private stripe: Stripe;
 
   constructor(
+    @inject("SalesRepository") private salesReposutory: SalesRepository,
     @inject("OrderRepository")
     private orderRepository: OrderRepository
   ) {
@@ -74,15 +77,24 @@ export class PaymentService implements PaymentServiceInterface {
           allow_redirects: "never",
         },
       });
-
-      await this.orderRepository.updateOrder(orderId, {
+      const updatedOrder = await this.orderRepository.updateOrder(orderId, {
         transactionId: paymentIntent.id,
+        status: "Paid",
       });
 
       console.info(
-        `Payment processed successfully for order: ${orderId} with transaction ID: ${paymentIntent.id}`
+        `Payment processed successfully for order: ${orderId} with transaction ID: ${paymentIntent.id}. ${updatedOrder}`
       );
+      const saleData: Partial<SaleEntity> = {
+        amount: order.totalPrice,
+        userId: order.userId,
+        orderId: orderId,
+        transactionId: paymentIntent.id,
+        saleDate: new Date(),
+        order: order,
+      };
 
+      const sale = await this.salesReposutory.createSale(saleData);
       return {
         message: "Payment processed successfully",
         transactionId: paymentIntent.id,

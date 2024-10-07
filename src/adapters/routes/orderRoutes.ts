@@ -12,7 +12,7 @@ const url = "/api-ecommerce/order";
 router.use(authMiddleware);
 router.post(
   `${url}`,
-  validateOrder,
+  //validateOrder,
   orderController.createOrder.bind(orderController)
 );
 router.get(url, orderController.getOrders.bind(orderController));

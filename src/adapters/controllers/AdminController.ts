@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Request, Response, NextFunction } from "express";
 import { inject, injectable } from "tsyringe";
 import { CategoryServiceInterface } from "@src/domain/services/categoryServiceInterface";
@@ -13,7 +14,6 @@ export class AdminController {
     @inject("SalesReportService")
     private salesReportService: SalesReportServiceInterface
   ) {}
-
   public async createCategory(
     req: Request<{}, {}, { name: string }>,
     res: Response,
@@ -23,9 +23,7 @@ export class AdminController {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { name } = req.body;
-
     try {
       const categoryId = await this.categoryService.createCategory(name);
       return res.status(201).json({
@@ -55,7 +53,6 @@ export class AdminController {
       }
     }
   }
-
   public async listCategories(
     req: Request,
     res: Response,
@@ -85,15 +82,13 @@ export class AdminController {
       }
     }
   }
-
-  // Relatórios de Vendas
   public async getSalesReport(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const totalSales = await this.salesReportService.getTotalSales();
+      const totalSales: number = await this.salesReportService.getTotalSales();
       return res.status(200).json({ totalSales });
     } catch (error) {
       console.error("Error fetching sales report:", error);

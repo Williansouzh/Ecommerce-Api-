@@ -51,7 +51,6 @@ export class OrderController {
         paymentDetails,
         paymentMethod,
       };
-
       const order = await this.orderService.createOrder(dto);
 
       return res.status(201).json({

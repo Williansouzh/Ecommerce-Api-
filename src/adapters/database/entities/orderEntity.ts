@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { OrderItemEntity } from "./OrderItemEntity";
+import { SaleEntity } from "./salesEntity";
 
 @Entity()
 export class OrderEntity {
@@ -24,4 +25,7 @@ export class OrderEntity {
 
   @Column()
   updatedAt!: Date;
+
+  @OneToMany(() => SaleEntity, (sale) => sale.order)
+  sales!: SaleEntity[];
 }
