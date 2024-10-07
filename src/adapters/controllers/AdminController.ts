@@ -88,7 +88,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const totalSales: number = await this.salesReportService.getTotalSales();
+      const totalSales = await this.salesReportService.getTotalSales();
       return res.status(200).json({ totalSales });
     } catch (error) {
       console.error("Error fetching sales report:", error);

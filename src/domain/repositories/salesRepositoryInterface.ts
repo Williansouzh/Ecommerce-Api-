@@ -1,3 +1,3 @@
 export interface SalesRepositoryInterface {
-  getTotalSales(): Promise<number>;
+  getTotalSalesSummary(): Promise<{ totalAmount: number; totalSales: number }>;
 }

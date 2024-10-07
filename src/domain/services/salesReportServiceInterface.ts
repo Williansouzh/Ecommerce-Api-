@@ -1,3 +1,3 @@
 export interface SalesReportServiceInterface {
-  getTotalSales(): Promise<number>;
+  getTotalSales(): Promise<{ totalAmount: number; totalSales: number }>;
 }

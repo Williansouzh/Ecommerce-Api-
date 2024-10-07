@@ -8,8 +8,11 @@ export class SalesReportService implements SalesReportServiceInterface {
   constructor(
     @inject("SalesRepository") private salesRepository: SalesRepository
   ) {}
-  async getTotalSales(): Promise<number> {
-    const result = await this.salesRepository.getTotalSales();
-    return result || 0;
+  async getTotalSales(): Promise<{ totalAmount: number; totalSales: number }> {
+    const result = await this.salesRepository.getTotalSalesSummary();
+    return {
+      totalAmount: result.totalAmount || 0,
+      totalSales: result.totalSales || 0,
+    };
   }
 }

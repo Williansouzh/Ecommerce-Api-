@@ -17,5 +17,13 @@ routes.get(
   validateUser,
   adminController.getSalesReport.bind(adminController)
 );
+routes.post(
+  `${url}/category`,
+  adminController.createCategory.bind(adminController)
+);
+routes.get(
+  `${url}/category`,
+  adminController.listCategories.bind(adminController)
+);
 
 export default routes;

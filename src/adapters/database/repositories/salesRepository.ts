@@ -15,18 +15,51 @@ export class SalesRepository implements SalesRepositoryInterface {
     const sale = this.repository.create(saleData);
     return await this.repository.save(sale);
   }
-  async getTotalSales(): Promise<number> {
+  async getTotalSalesSummary(): Promise<{
+    totalAmount: number;
+    totalSales: number;
+  }> {
     try {
       const result = await this.repository
         .createQueryBuilder("sales")
-        .select("SUM(sales.amount)", "totalSales")
+        .select("SUM(sales.amount)", "totalAmount")
+        .addSelect("COUNT(sales.id)", "totalSales")
         .getRawOne();
-      return result?.totalSales || 0;
+
+      return {
+        totalAmount: result?.totalAmount || 0,
+        totalSales: result?.totalSales || 0,
+      };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
       throw new Error(
-        "Error during getTotal Sales repository: " + errorMessage
+        "Error during getTotalSalesSummary repository: " + errorMessage
+      );
+    }
+  }
+
+  async getSalesDetails(): Promise<SaleEntity[]> {
+    try {
+      const sales = await this.repository
+        .createQueryBuilder("sales")
+        .leftJoinAndSelect("sales.order", "order")
+        .select([
+          "sales.id",
+          "sales.amount",
+          "sales.transactionId",
+          "sales.saleDate",
+          "order.id",
+          "order.totalPrice",
+        ])
+        .getMany();
+
+      return sales;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(
+        "Error during getSalesDetails repository: " + errorMessage
       );
     }
   }
