@@ -16,7 +16,9 @@ import { UserRepositoryInterface } from "./domain/repositories/userRepositoryInt
 import { UserServiceInterface } from "./domain/services/userServiceInterface";
 import { container } from "tsyringe";
 import { EmailService } from "./application/services/emailService";
-
+import { swaggerDocs } from "./swagger";
+import swaggerUi from "swagger-ui-express";
+import cors from "cors";
 export class App {
   readonly port: number;
   readonly app: Application;
@@ -37,6 +39,14 @@ export class App {
   }
 
   private configureMiddleware(): void {
+    this.app.use(
+      cors({
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      })
+    );
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
   }
@@ -68,6 +78,7 @@ export class App {
   }
 
   private setupRoutes(): void {
+    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
     this.app.use(authRoutes);
     this.app.use(productRoutes);
     this.app.use(cartRoutes);
