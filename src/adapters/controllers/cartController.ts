@@ -16,7 +16,7 @@ export class CartController {
     next: NextFunction
   ): Promise<void> {
     const { name, productId, price, quantity } = req.body as CartItemDTO;
-    const userId = req.decoded?.userId as string;
+    const userId = (await req.decoded?.userId) as string;
     const item: CartItemDTO = {
       productId: productId,
       quantity: quantity,
@@ -24,6 +24,7 @@ export class CartController {
       price: 0,
     };
     if (!userId) {
+      console.log(req.decoded);
       throw new Error("User id is required");
     }
     try {

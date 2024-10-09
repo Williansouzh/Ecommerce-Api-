@@ -110,6 +110,46 @@ import {
  *                   type: string
  *                   example: "Email or passwod wrong"
  */
+/**
+ * @swagger
+ * /auth/password-recovery:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: Password Recovery
+ *     operationId: passwordRecovery
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "johndoe123@gmail.com"
+ *     responses:
+ *       200:
+ *         description: Password recovery email sent..
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password recovery email sent."
+ *       403:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Email or passwod wrong"
+ */
 const routes = Router();
 const url = "/api-ecommerce/auth";
 const authController = container.resolve(AuthController);

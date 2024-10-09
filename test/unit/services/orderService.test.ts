@@ -44,6 +44,12 @@ describe("OrderService", () => {
       userId: "userId-123",
       totalPrice: 100,
       items: [],
+      paymentMethod: "",
+      paymentDetails: {
+        cardNumber: "",
+        expiryDate: "",
+        cvv: "",
+      },
     };
 
     const cartItems = [

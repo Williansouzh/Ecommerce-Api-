@@ -75,6 +75,13 @@ describe("Order Controller", () => {
           },
         ],
         totalPrice: 61.97,
+        paymentDetails: {
+          cardNumber: "1414141414",
+          cvv: "122",
+          expiryDate: "31/2023",
+        },
+        paymentMethod: "Credit Card",
+        status: "pending",
       };
 
       const response = await global.testRequest
