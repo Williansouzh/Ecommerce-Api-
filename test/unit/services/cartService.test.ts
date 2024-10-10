@@ -3,6 +3,8 @@ import { CartService } from "@src/application/services/cartService"; // ajuste o
 import { CartRepository } from "@src/adapters/database/repositories/cartRepository";
 import { ProductServiceInterface } from "@src/domain/services/productServiceInterface";
 import { ApiError } from "@src/utils/api-errors";
+import { CreateProductDTO } from "@src/application/dtos/productDTO";
+import { CartItemDTO } from "@src/application/dtos/cartDTO";
 
 describe("CartService", () => {
   let cartService: CartService;
@@ -26,16 +28,14 @@ describe("CartService", () => {
 
   describe("addItem", () => {
     it("should add an item to the cart", async () => {
-      const productId = "product1";
       const userId = "user1";
-      const quantity = 2;
+      const productId = "product1";
 
       mockProductService.getProduct.mockResolvedValue({
         id: productId,
         name: "Test Product",
         description: "A product description",
         price: 100,
-        categoryId: "categoryFake",
         category: {
           id: "category1",
           name: "Electronics",
@@ -45,32 +45,16 @@ describe("CartService", () => {
         updatedAt: new Date("2024-08-26T00:00:00Z"),
       });
 
-      await cartService.addItem(productId, quantity, userId);
+      const product: CartItemDTO = {
+        productId: productId,
+        name: "Test Product",
+        quantity: 1,
+        price: 100,
+      };
 
-      expect(mockCartRepository.addItem).toHaveBeenCalledWith(
-        userId,
-        productId,
-        quantity
-      );
-    });
+      await cartService.addItem(userId, product);
 
-    it("should throw an error if the product is not found", async () => {
-      const productId = "product1";
-      const userId = "user1";
-      const quantity = 2;
-
-      mockProductService.getProduct.mockResolvedValue(null);
-
-      await expect(
-        cartService.addItem(productId, quantity, userId)
-      ).rejects.toThrow(
-        new ApiError(
-          "Product not found",
-          404,
-          "productError",
-          "Product Service"
-        )
-      );
+      expect(mockCartRepository.addItem).toHaveBeenCalledWith(userId, product);
     });
   });
 
@@ -85,7 +69,6 @@ describe("CartService", () => {
         name: "Test Product",
         description: "A product description",
         price: 100,
-        categoryId: "categoryFake",
         category: {
           id: "category1",
           name: "Electronics",

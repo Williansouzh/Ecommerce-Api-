@@ -101,11 +101,11 @@ describe("OrderService", () => {
             name: "Product 1",
             quantity: 1,
             price: 100,
-            order: orderEntity,
           }),
         ]),
       })
     );
+
     expect(result).toEqual(orderEntity);
   });
 

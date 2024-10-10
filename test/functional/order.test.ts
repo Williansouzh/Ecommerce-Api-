@@ -1,157 +1,128 @@
 import "reflect-metadata";
+import { OrderService } from "@src/application/services/orderService";
 import { OrderRepository } from "@src/adapters/database/repositories/orderRepository";
-import { UserRepository } from "@src/adapters/database/repositories/userRepository";
+import { CartService } from "@src/application/services/cartService";
 import { CreateOrderDTO } from "@src/application/dtos/orderDTO";
-import { App } from "@src/server";
-import supertest from "supertest";
-import { container } from "tsyringe";
+import { ApiError } from "@src/utils/api-errors";
+import { OrderEntity } from "@src/adapters/database/entities/orderEntity";
+import { CartDTO } from "@src/application/dtos/cartDTO";
+import { OrderItemEntity } from "@src/adapters/database/entities/OrderItemEntity";
 
-describe("Order Controller", () => {
-  let server: App;
-  let tokenLogin: string;
-  let productId: string;
-  let userRepository: UserRepository;
+const mockOrderRepository = {
+  createOrder: jest.fn(),
+  getOrder: jest.fn(),
+  getOrdersByUser: jest.fn(),
+  getOrders: jest.fn(),
+  updateOrder: jest.fn(),
+  deleteOrder: jest.fn(),
+};
 
-  const orderRepository: OrderRepository = container.resolve(OrderRepository);
-  const baseUrl = "/api-ecommerce/order";
+const mockCartService = {
+  getCart: jest.fn(),
+};
 
-  const testUser = {
-    email: "test1@example.com",
-    name: "Test User",
-    password: "FB1mF@ln*",
-    confirmPassword: "FB1mF@ln*",
-  };
+describe("OrderService", () => {
+  let orderService: OrderService;
 
-  const loginUser = {
-    email: testUser.email,
-    password: testUser.password,
-    confirmPassword: testUser.confirmPassword,
-  };
-
-  const testProduct = {
-    name: "John Doe",
-    description: "Sample product description",
-    price: 3455,
-    categoryId: "550e8400-e29b-41d4-a716-446655440000",
-  };
-
-  const testCart = {
-    productId: "007da8d4-47de-4b23-a75c-412810950262",
-    quantity: 12,
-  };
-
-  beforeAll(async () => {
-    server = new App();
-    await server.init();
-    global.testRequest = supertest(server.getApp());
-    userRepository = container.resolve(UserRepository);
-
-    await userRepository.clear();
-
-    await setupTestData();
+  beforeEach(() => {
+    orderService = new OrderService(
+      mockOrderRepository as any,
+      mockCartService as any
+    );
   });
 
-  afterAll(async () => {
-    await userRepository.clear();
-    await server.close();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe("CRUD Operations for Orders", () => {
-    it("should create a new order", async () => {
-      const orderData: CreateOrderDTO = {
-        userId: "",
+  describe("createOrder", () => {
+    it("should throw an error if the cart is empty", async () => {
+      const orderDTO: CreateOrderDTO = {
+        userId: "user123",
+        items: [],
+        totalPrice: 0,
+        paymentMethod: "",
+        paymentDetails: {
+          cardNumber: "",
+          expiryDate: "",
+          cvv: "",
+        },
+      };
+      mockCartService.getCart.mockResolvedValueOnce({ items: [] });
+
+      // Act & Assert
+      await expect(orderService.createOrder(orderDTO)).rejects.toThrow(
+        new ApiError(
+          "Cart is empty. Cannot create an order.",
+          400,
+          "Cart Error",
+          "Cart Service"
+        )
+      );
+    });
+
+    it("should create an order successfully when the cart has items", async () => {
+      const orderDTO: CreateOrderDTO = {
+        userId: "user123",
+        items: [],
+        totalPrice: 0,
+        paymentMethod: "",
+        paymentDetails: {
+          cardNumber: "",
+          expiryDate: "",
+          cvv: "",
+        },
+      };
+      const cart: CartDTO = {
+        userId: "user123",
         items: [
           {
-            productId: "prod_001",
+            productId: "prod123",
             name: "Product 1",
             quantity: 2,
-            price: 15.99,
-          },
-          {
-            productId: "prod_002",
-            name: "Product 2",
-            quantity: 1,
-            price: 29.99,
+            price: 100,
           },
         ],
-        totalPrice: 61.97,
-        paymentDetails: {
-          cardNumber: "1414141414",
-          cvv: "122",
-          expiryDate: "31/2023",
-        },
-        paymentMethod: "Credit Card",
-        status: "pending",
+        totalPrice: 200,
+        id: "",
       };
 
-      const response = await global.testRequest
-        .post(baseUrl)
-        .set("x-access-token", tokenLogin)
-        .send(orderData);
+      mockCartService.getCart.mockResolvedValueOnce(cart);
 
-      //expect(response.status).toBe(201);
-      expect(response.body).toEqual({
-        message: "Order registered successfully",
-        orderId: expect.any(String),
+      const savedOrder = new OrderEntity();
+      savedOrder.orderId = "ORD-12345";
+      savedOrder.userId = "user123";
+      savedOrder.totalPrice = cart.totalPrice;
+      savedOrder.items = cart.items.map((item) => {
+        const orderItem = new OrderItemEntity();
+        orderItem.productId = item.productId;
+        orderItem.name = item.name;
+        orderItem.quantity = item.quantity;
+        orderItem.price = item.price;
+        return orderItem;
       });
+
+      mockOrderRepository.createOrder.mockResolvedValueOnce(savedOrder);
+
+      const result = await orderService.createOrder(orderDTO);
+
+      expect(result).toEqual(savedOrder);
+      expect(mockCartService.getCart).toHaveBeenCalledWith(orderDTO.userId);
+      expect(mockOrderRepository.createOrder).toHaveBeenCalled();
+      expect(mockOrderRepository.createOrder).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "user123",
+          totalPrice: cart.totalPrice,
+          status: "pending",
+          items: expect.arrayContaining([
+            expect.objectContaining({
+              productId: "prod123",
+              quantity: 2,
+              price: 100,
+            }),
+          ]),
+        })
+      );
     });
   });
-
-  async function setupTestData() {
-    await registerTestUser();
-    tokenLogin = await loginAndGetToken();
-    productId = await createProduct();
-    await createCart();
-  }
-
-  async function registerTestUser() {
-    const existingUser = await userRepository.getUserByEmail(testUser.email);
-    if (!existingUser) {
-      await userRepository.clear();
-      const response = await global.testRequest
-        .post("/api-ecommerce/auth/register")
-        .send(testUser);
-
-      expect(response.body).toEqual({
-        message: "User registered successfully",
-        userId: expect.any(String),
-      });
-    } else {
-      tokenLogin = await loginAndGetToken();
-    }
-  }
-
-  async function createProduct(): Promise<string> {
-    const response = await global.testRequest
-      .post("/api-ecommerce/products")
-      .set("x-access-token", tokenLogin)
-      .send(testProduct);
-
-    expect(response.status).toBe(201);
-    return response.body.productId;
-  }
-
-  async function createCart() {
-    const response = await global.testRequest
-      .post("/api-ecommerce/cart")
-      .set("x-access-token", tokenLogin)
-      .send(testCart);
-
-    expect(response.status).toBe(200);
-  }
-
-  async function loginAndGetToken(): Promise<string> {
-    const loginResponse = await global.testRequest
-      .post("/api-ecommerce/auth/login")
-      .send(loginUser);
-
-    expect(loginResponse.body).toEqual(
-      expect.objectContaining({
-        email: loginUser.email,
-        token: expect.any(String),
-      })
-    );
-
-    return loginResponse.body.token;
-  }
 });

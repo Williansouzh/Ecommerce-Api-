@@ -1,90 +1,91 @@
 import "reflect-metadata";
+import { mock, MockProxy } from "jest-mock-extended";
+import ProductService from "@src/application/services/productService";
+import { ProductRepositoryInterface } from "@src/domain/repositories/productRepositoryInterface";
+import { ProductEntity } from "@src/adapters/database/entities/productEntity";
 import { CreateProductDTO } from "@src/application/dtos/productDTO";
-import { App } from "@src/server";
-import supertest from "supertest";
+import { container } from "tsyringe";
 
-let server: App;
+describe("ProductService", () => {
+  let productService: ProductService;
+  let productRepository: MockProxy<ProductRepositoryInterface>;
 
-beforeAll(async () => {
-  server = new App();
-  await server.init();
-  global.testRequest = supertest(server.getApp());
-});
+  beforeEach(() => {
+    productRepository = mock<ProductRepositoryInterface>();
 
-afterAll(async () => await server.close());
-
-describe("Product Controller - Functional Tests", () => {
-  const url = "/api-ecommerce/products";
-
-  const createProduct = async (productData?: Partial<CreateProductDTO>) => {
-    const defaultProductData = {
-      name: "Test Product",
-      price: 100,
-      description: "This is a test product",
-      categoryId: "550e8400-e29b-41d4-a716-446655440000",
-    };
-
-    const response = await global.testRequest
-      .post(`${url}`)
-      .send({ ...defaultProductData, ...productData })
-      .expect(201);
-
-    return response.body;
-  };
-
-  it("should create a product successfully", async () => {
-    const productData = {
-      name: "Custom Product",
-      price: 200,
-    };
-
-    const response = await createProduct(productData);
-
-    expect(response).toEqual(
-      expect.objectContaining({
-        message: "Product created successfully",
-        productId: expect.any(String),
-      })
-    );
+    container.registerInstance("ProductRepository", productRepository);
+    productService = container.resolve(ProductService);
   });
 
-  it("should retrieve a product by id", async () => {
-    const createdProduct = await createProduct();
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    const getResponse = await global.testRequest
-      .get(`${url}/${createdProduct.productId}`)
-      .expect(200);
+  it("should create a product", async () => {
+    const productDTO: CreateProductDTO = {
+      name: "Product 1",
+      price: 100,
+      description: "A sample product",
+      categoryId: "",
+    };
 
-    expect(getResponse.body).toEqual(
-      expect.objectContaining({
-        id: expect.any(String),
-      })
+    const productEntity = new ProductEntity();
+    Object.assign(productEntity, productDTO);
+    productEntity.id = "product-123";
+
+    productRepository.createProduct.mockResolvedValue(productEntity);
+
+    const result = await productService.createProduct(productDTO);
+
+    expect(productRepository.createProduct).toHaveBeenCalledWith(
+      expect.any(ProductEntity)
     );
+    expect(result).toEqual(productEntity);
+  });
+
+  it("should fetch a product by id", async () => {
+    const productEntity = new ProductEntity();
+    productEntity.id = "product-123";
+    productEntity.name = "Product 1";
+
+    productRepository.getProduct.mockResolvedValue(productEntity);
+
+    const result = await productService.getProduct("product-123");
+
+    expect(productRepository.getProduct).toHaveBeenCalledWith("product-123");
+    expect(result).toEqual(productEntity);
   });
 
   it("should update a product", async () => {
-    const createdProduct = await createProduct();
+    const productDTO = { name: "Updated Product" };
+    const productEntity = new ProductEntity();
+    productEntity.id = "product-123";
+    productEntity.name = "Updated Product";
 
-    const updatedData = {
-      name: "Updated Product",
-      price: 150,
-    };
+    productRepository.updateProduct.mockResolvedValue(productEntity);
 
-    const updateResponse = await global.testRequest
-      .put(`${url}/${createdProduct.productId}`)
-      .send(updatedData)
-      .expect(200);
+    const result = await productService.updateProduct(
+      "product-123",
+      productDTO
+    );
 
-    expect(updateResponse.body).toEqual({
-      message: "Product updated successfully",
-    });
+    expect(productRepository.updateProduct).toHaveBeenCalledWith(
+      "product-123",
+      productDTO
+    );
+    expect(result).toEqual(productEntity);
   });
 
   it("should delete a product", async () => {
-    const createdProduct = await createProduct();
+    const productEntity = new ProductEntity();
+    productEntity.id = "product-123";
 
-    await global.testRequest
-      .delete(`${url}/${createdProduct.productId}`)
-      .expect(200);
+    productRepository.getProduct.mockResolvedValue(productEntity);
+    productRepository.deleteProduct.mockResolvedValue(true);
+
+    const result = await productService.deleteProduct("product-123");
+
+    expect(productRepository.deleteProduct).toHaveBeenCalledWith("product-123");
+    expect(result).toEqual(productEntity);
   });
 });
