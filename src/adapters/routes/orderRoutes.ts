@@ -263,4 +263,5 @@ router.put(
   `${url}/:id/status`,
   orderController.updateOrderStatus.bind(orderController)
 );
+router.delete(`${url}/:id`, orderController.deleteOrder.bind(orderController));
 export default router;

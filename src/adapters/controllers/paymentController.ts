@@ -26,13 +26,16 @@ export class PaymentController {
 
     const userId = req.decoded?.userId;
     if (!userId) {
-      throw new ApiError(
-        "User id not found",
-        403,
-        "PaymentController",
-        "PaymentController"
+      return next(
+        new ApiError( // Modificado para chamar next
+          "User id not found",
+          403,
+          "PaymentController",
+          "PaymentController"
+        )
       );
     }
+
     try {
       const result = await this.paymentService.processPayment(
         orderId,

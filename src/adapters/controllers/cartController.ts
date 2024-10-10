@@ -17,16 +17,19 @@ export class CartController {
   ): Promise<void> {
     const { name, productId, price, quantity } = req.body as CartItemDTO;
     const userId = (await req.decoded?.userId) as string;
+
+    if (!userId) {
+      console.log(req.decoded);
+      return next(new Error("User id is required"));
+    }
+
     const item: CartItemDTO = {
       productId: productId,
       quantity: quantity,
-      name: "",
-      price: 0,
+      name: name,
+      price: price,
     };
-    if (!userId) {
-      console.log(req.decoded);
-      throw new Error("User id is required");
-    }
+
     try {
       await this.cartService.addItem(userId, item);
       res.status(200).json({ message: "Item added to cart" });

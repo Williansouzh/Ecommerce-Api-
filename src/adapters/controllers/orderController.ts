@@ -119,7 +119,7 @@ export class OrderController {
     }
   }
   public async deleteOrder(
-    req: Request<{ id: string }>, // Assuming orderId is passed as a URL parameter
+    req: Request<{ id: string }>,
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
@@ -128,7 +128,7 @@ export class OrderController {
       return res.status(400).json({ message: "User ID is required." });
     }
 
-    const { id: orderId } = req.params; // Extracting orderId from URL parameters
+    const { id: orderId } = req.params;
 
     try {
       const order = await this.orderService.getOrder(orderId);

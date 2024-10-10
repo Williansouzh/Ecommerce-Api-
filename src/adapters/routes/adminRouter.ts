@@ -163,6 +163,7 @@ routes.post(
 );
 routes.get(
   `${url}/category`,
+
   adminController.listCategories.bind(adminController)
 );
 
