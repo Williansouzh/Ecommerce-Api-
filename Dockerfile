@@ -21,7 +21,6 @@ FROM node:16 AS production
 
 # Diretório de trabalho na fase de produção
 WORKDIR /app
-
 # Copia os arquivos da build da fase anterior
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package*.json ./
