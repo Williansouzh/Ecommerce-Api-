@@ -4,7 +4,7 @@
   "description": "This documentation outlines the development of a secure and robust e-commerce system using Node.js, Express, Redis, TypeORM, and PostgreSQL with a hexagonal architecture. The system covers a range of functionalities, from user authentication to product management and order processing.",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/src/index.js",
+    "start": "node ./dist/src/index.js",
     "start:local": "ts-node-dev --transpile-only src/index.ts",
     "build": "tsc",
     "test:unit": "jest ./test/unit --forceExit ",

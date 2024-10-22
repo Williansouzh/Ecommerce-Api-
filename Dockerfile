@@ -7,14 +7,20 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-RUN npm run build  # Ensure this builds the TypeScript files into the dist directory
+# Compile o TypeScript e verifique a saída
+RUN npm run build   
 
-FROM node:16 AS production
+FROM node:20 AS production  
 
 WORKDIR /app
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist ./dist/
 COPY --from=build /app/package*.json ./
 
+# Instale apenas as dependências de produção
 RUN npm install --only=production
 
-CMD ["node", "dist/src/index.js"]  # Ensure the entry point is correct
+# Verifique se os arquivos foram copiados corretamente
+
+# Comando para iniciar a aplicação
+CMD ["node", "dist/src/index.js"]
+

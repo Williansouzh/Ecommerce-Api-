@@ -9,11 +9,7 @@ services:
       - postgres
     env_file: # Usando o arquivo .env
       - .env
-    volumes:
-      - .:/app
-      - /app/node_modules # Evita sobrescrever node_modules no host
     working_dir: /app
-    command: bash -c "npm install && npm run start" # Instala dependências no container
 
   # Serviço do PostgreSQL
   postgres:
