@@ -13,6 +13,9 @@ const swaggerOptions = {
       {
         url: "http://localhost:3300/api-ecommerce",
       },
+      {
+        url: "http://ec2-3-93-64-122.compute-1.amazonaws.com:3000/",
+      },
     ],
   },
   apis: ["./src/adapters/routes/*.ts"],
