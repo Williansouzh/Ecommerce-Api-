@@ -18,8 +18,6 @@ COPY --from=build /app/package*.json ./
 
 # Instale apenas as dependências de produção
 RUN npm install --only=production
-# Verifique se os arquivos foram copiados corretamente
-
 # Comando para iniciar a aplicação
 CMD ["node", "dist/src/index.js"]
 
