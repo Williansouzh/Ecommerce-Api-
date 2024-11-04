@@ -10,6 +10,8 @@ services:
     env_file: # Usando o arquivo .env
       - .env
     working_dir: /app
+    command: >
+      sh -c "./wait-for-it.sh postgres:5432 -- npm run migration:run && npm start"
 
   # Serviço do PostgreSQL
   postgres:
