@@ -1,29 +1,37 @@
+version: "3.8"
+
 services:
-  # Serviço da API
+  # API service
   api:
     build: .
     image: ecommerce-api-api:latest
     ports:
-      - "3000:3300"
+      - "3000:3000"
     depends_on:
-      - postgres
-    env_file: # Usando o arquivo .env
+      postgres:
+        condition: service_healthy
+    env_file:
       - .env
     working_dir: /app
+    command: sh -c "npx typeorm migration:run -d dist/src/data-source.js && node dist/src/index.js"
 
-  # Serviço do PostgreSQL
+  # PostgreSQL service
   postgres:
     image: postgres:latest
     environment:
-      TYPEORM_HOST: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: toor
-      POSTGRES_DB: ecommerce-api
+      POSTGRES_DB: ecommerce-api-2
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# Volumes para persistir os dados do PostgreSQL
+# Volumes for PostgreSQL data persistence
 volumes:
   postgres-data:

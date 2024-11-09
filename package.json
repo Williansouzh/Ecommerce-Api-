@@ -13,7 +13,11 @@
     "typeorm": "ts-node-dev node_modules/typeorm/cli.js",
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:generate ./src/adapters/database/migrations/default",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:run",
-    "migration:revert": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:revert"
+    "migration:revert": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:revert",
+    "typeorm:generate": "npx typeorm-ts-node-esm migration:generate -d src/db/dataSourceLocal.ts",
+    "typeorm:migrate": "npx typeorm-ts-node-esm migration:run -d ./src/dataSourceLocal.ts",
+    "typeorm:revert": "npx typeorm-ts-node-esm migration:revert -d src/db/dataSourceLocal.ts",
+    "typeorm:drop": "npx typeorm-ts-node-esm schema:drop -d src/db/dataSourceLocal.ts"
   },
   "keywords": [],
   "author": "",

@@ -19,5 +19,6 @@ COPY --from=build /app/package*.json ./
 # Instale apenas as dependências de produção
 RUN npm install --only=production
 # Comando para iniciar a aplicação
-CMD ["node", "dist/src/index.js"]
+
+CMD npx typeorm migration:run -d dist/src/data-source.js && node dist/src/index.js
 
